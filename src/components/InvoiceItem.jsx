@@ -7,63 +7,76 @@ const InvoiceItem = ({ id, name, qty, price, onDeleteItem, onEdtiItem }) => {
   };
 
   return (
-    <tr>
-      <td className="w-full">
+    <tr className="bg-white transition-colors hover:bg-gray-50 dark:bg-transparent dark:hover:bg-gray-800/60">
+      <td className="w-full px-3 py-3">
         <InvoiceField
           onEditItem={(event) => onEdtiItem(event)}
           cellData={{
-            placeholder: 'Item name',
-            type: 'text',
-            name: 'name',
+            placeholder: "Item name",
+            type: "text",
+            name: "name",
             id: id,
             value: name,
+            className:
+              "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500",
           }}
         />
       </td>
-      <td className="min-w-[65px] md:min-w-[80px]">
+
+      <td className="min-w-[65px] px-3 py-3 md:min-w-[80px]">
         <InvoiceField
           onEditItem={(event) => onEdtiItem(event)}
           cellData={{
-            type: 'number',
-            min: '1',
-            name: 'qty',
+            type: "number",
+            min: "1",
+            name: "qty",
             id: id,
             value: qty,
+            className:
+              "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-right shadow-sm outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500",
           }}
         />
       </td>
-      <td className="relative min-w-[100px] md:min-w-[150px]">
+
+      <td className="relative min-w-[100px] px-3 py-3 md:min-w-[150px]">
+        {/* Rupee icon at left of the input */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute left-2 top-1/2 h-6 w-6 -translate-y-1/2 text-gray-400 sm:left-4"
+          className="pointer-events-none absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 sm:left-3 dark:text-gray-500"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
+          {/* ₹ outline icon */}
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            d="M6 4h12M6 8h12M12 20l-6-8h3a6 6 0 006-6"
           />
         </svg>
+
         <InvoiceField
           onEditItem={(event) => onEdtiItem(event)}
           cellData={{
-            className: 'text-right',
-            type: 'number',
-            min: '0.01',
-            step: '0.01',
-            name: 'price',
+            className:
+              "w-full rounded-lg border border-gray-300 bg-white py-2 pl-8 pr-3 text-right text-sm shadow-sm outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500",
+            type: "number",
+            min: "0.01",
+            step: "0.01",
+            name: "price",
             id: id,
             value: price,
           }}
         />
       </td>
-      <td className="flex items-center justify-center">
+
+      <td className="px-3 py-3">
         <button
-          className="rounded-md bg-red-500 p-2 text-white shadow-sm transition-colors duration-200 hover:bg-red-600"
+          className="inline-flex items-center justify-center rounded-lg bg-red-500 p-2 text-white shadow-sm transition
+                     hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 active:scale-95"
           onClick={deleteItemHandler}
+          type="button"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

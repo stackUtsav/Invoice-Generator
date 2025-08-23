@@ -27,52 +27,43 @@ const InvoiceModal = ({
         img.crossOrigin = 'annoymous';
         img.src = dataUrl;
         img.onload = () => {
-          // Initialize the PDF.
           const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'in',
             format: [5.5, 8.5],
           });
 
-          // Define reused data
           const imgProps = pdf.getImageProperties(img);
           const imageType = imgProps.fileType;
           const pdfWidth = pdf.internal.pageSize.getWidth();
 
-          // Calculate the number of pages.
           const pxFullHeight = imgProps.height;
           const pxPageHeight = Math.floor((imgProps.width * 8.5) / 5.5);
           const nPages = Math.ceil(pxFullHeight / pxPageHeight);
 
-          // Define pageHeight separately so it can be trimmed on the final page.
           let pageHeight = pdf.internal.pageSize.getHeight();
 
-          // Create a one-page canvas to split up the full image.
           const pageCanvas = document.createElement('canvas');
           const pageCtx = pageCanvas.getContext('2d');
           pageCanvas.width = imgProps.width;
           pageCanvas.height = pxPageHeight;
 
           for (let page = 0; page < nPages; page++) {
-            // Trim the final page to reduce file size.
             if (page === nPages - 1 && pxFullHeight % pxPageHeight !== 0) {
               pageCanvas.height = pxFullHeight % pxPageHeight;
               pageHeight = (pageCanvas.height * pdfWidth) / pageCanvas.width;
             }
-            // Display the page.
             const w = pageCanvas.width;
             const h = pageCanvas.height;
             pageCtx.fillStyle = 'white';
             pageCtx.fillRect(0, 0, w, h);
             pageCtx.drawImage(img, 0, page * pxPageHeight, w, h, 0, 0, w, h);
 
-            // Add the page to the PDF.
             if (page) pdf.addPage();
 
             const imgData = pageCanvas.toDataURL(`image/${imageType}`, 1);
             pdf.addImage(imgData, imageType, 0, 0, pdfWidth, pageHeight);
           }
-          // Output / Save
           pdf.save(`invoice-${invoiceInfo.invoiceNumber}.pdf`);
         };
       })
@@ -98,16 +89,14 @@ const InvoiceModal = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+            <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm dark:bg-black/60" />
           </Transition.Child>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
-          <span
-            className="inline-block h-screen align-middle"
-            aria-hidden="true"
-          >
+          {/* Centering hack */}
+          <span className="inline-block h-screen align-middle" aria-hidden="true">
             &#8203;
           </span>
+
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -117,77 +106,82 @@ const InvoiceModal = ({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="my-8 inline-block w-full max-w-md transform overflow-hidden rounded-lg bg-white text-left align-middle shadow-xl transition-all">
-              <div className="p-4" id="print">
-                <h1 className="text-center text-lg font-bold text-gray-900">
+            <div className="my-8 inline-block w-full max-w-md transform overflow-hidden rounded-2xl border border-gray-200 bg-white text-left align-middle shadow-xl transition-all dark:border-gray-800 dark:bg-gray-900">
+              <div className="p-5" id="print">
+                <h1 className="text-center text-xl font-extrabold tracking-wide text-gray-900 dark:text-gray-100">
                   INVOICE
                 </h1>
+
                 <div className="mt-6">
-                  <div className="mb-4 grid grid-cols-2">
-                    <span className="font-bold">Invoice Number:</span>
-                    <span>{invoiceInfo.invoiceNumber}</span>
-                    <span className="font-bold">Cashier:</span>
-                    <span>{invoiceInfo.cashierName}</span>
-                    <span className="font-bold">Customer:</span>
-                    <span>{invoiceInfo.customerName}</span>
+                  <div className="mb-4 grid grid-cols-2 gap-y-2 text-sm">
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">Invoice Number:</span>
+                    <span className="text-gray-800 dark:text-gray-100">{invoiceInfo.invoiceNumber}</span>
+
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">Cashier:</span>
+                    <span className="text-gray-800 dark:text-gray-100">{invoiceInfo.cashierName}</span>
+
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">Customer:</span>
+                    <span className="text-gray-800 dark:text-gray-100">{invoiceInfo.customerName}</span>
                   </div>
 
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className="border-y border-black/10 text-sm md:text-base">
-                        <th>ITEM</th>
-                        <th className="text-center">QTY</th>
-                        <th className="text-right">PRICE</th>
-                        <th className="text-right">AMOUNT</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.map((item) => (
-                        <tr key={item.id}>
-                          <td className="w-full">{item.name}</td>
-                          <td className="min-w-[50px] text-center">
-                            {item.qty}
-                          </td>
-                          <td className="min-w-[80px] text-right">
-                            ${Number(item.price).toFixed(2)}
-                          </td>
-                          <td className="min-w-[90px] text-right">
-                            ${Number(item.price * item.qty).toFixed(2)}
-                          </td>
+                  <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+                    <table className="w-full text-left">
+                      <thead className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+                        <tr className="text-xs uppercase tracking-wide md:text-sm">
+                          <th className="px-3 py-3">Item</th>
+                          <th className="px-3 py-3 text-center">Qty</th>
+                          <th className="px-3 py-3 text-right">Price</th>
+                          <th className="px-3 py-3 text-right">Amount</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                        {items.map((item) => (
+                          <tr key={item.id} className="bg-white transition-colors hover:bg-gray-50 dark:bg-transparent dark:hover:bg-gray-800/60">
+                            <td className="w-full px-3 py-3 text-gray-800 dark:text-gray-100">{item.name}</td>
+                            <td className="min-w-[50px] px-3 py-3 text-center tabular-nums text-gray-800 dark:text-gray-100">
+                              {item.qty}
+                            </td>
+                            <td className="min-w-[80px] px-3 py-3 text-right tabular-nums text-gray-800 dark:text-gray-100">
+                              ₹{Number(item.price).toFixed(2)}
+                            </td>
+                            <td className="min-w-[90px] px-3 py-3 text-right tabular-nums text-gray-800 dark:text-gray-100">
+                              ₹{Number(item.price * item.qty).toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
 
                   <div className="mt-4 flex flex-col items-end space-y-2">
-                    <div className="flex w-full justify-between border-t border-black/10 pt-2">
-                      <span className="font-bold">Subtotal:</span>
-                      <span>${invoiceInfo.subtotal.toFixed(2)}</span>
+                    <div className="flex w-full justify-between border-t border-gray-200 pt-3 dark:border-gray-800">
+                      <span className="font-semibold text-gray-700 dark:text-gray-200">Subtotal:</span>
+                      <span className="tabular-nums text-gray-900 dark:text-gray-100">₹{invoiceInfo.subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex w-full justify-between">
-                      <span className="font-bold">Discount:</span>
-                      <span>${invoiceInfo.discountRate.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-700 dark:text-gray-200">Discount:</span>
+                      <span className="tabular-nums text-gray-900 dark:text-gray-100">₹{invoiceInfo.discountRate.toFixed(2)}</span>
                     </div>
                     <div className="flex w-full justify-between">
-                      <span className="font-bold">Tax:</span>
-                      <span>${invoiceInfo.taxRate.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-700 dark:text-gray-200">Tax:</span>
+                      <span className="tabular-nums text-gray-900 dark:text-gray-100">₹{invoiceInfo.taxRate.toFixed(2)}</span>
                     </div>
-                    <div className="flex w-full justify-between border-t border-black/10 py-2">
-                      <span className="font-bold">Total:</span>
-                      <span className="font-bold">
-                        $
-                        {invoiceInfo.total % 1 === 0
-                          ? invoiceInfo.total
-                          : invoiceInfo.total.toFixed(2)}
+                    <div className="flex w-full justify-between border-t border-gray-200 py-3 dark:border-gray-800">
+                      <span className="text-base font-bold text-gray-900 dark:text-gray-100">Total:</span>
+                      <span className="text-base font-extrabold text-blue-600 dark:text-blue-400 tabular-nums">
+                        ₹{invoiceInfo.total % 1 === 0 ? invoiceInfo.total : invoiceInfo.total.toFixed(2)}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="mt-4 flex space-x-2 px-4 pb-6">
+
+              <div className="mt-4 flex gap-2 px-5 pb-6">
                 <button
-                  className="flex w-full items-center justify-center space-x-1 rounded-md border border-blue-500 py-2 text-sm text-blue-500 shadow-sm hover:bg-blue-500 hover:text-white"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-blue-500 py-2 text-sm font-medium text-blue-600 shadow-sm transition
+                             hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95 dark:text-blue-400 dark:hover:text-white"
                   onClick={SaveAsPDFHandler}
+                  type="button"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -205,9 +199,12 @@ const InvoiceModal = ({
                   </svg>
                   <span>Download</span>
                 </button>
+
                 <button
                   onClick={addNextInvoiceHandler}
-                  className="flex w-full items-center justify-center space-x-1 rounded-md bg-blue-500 py-2 text-sm text-white shadow-sm hover:bg-blue-600"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2 text-sm font-medium text-white shadow-sm transition
+                             hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95"
+                  type="button"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
