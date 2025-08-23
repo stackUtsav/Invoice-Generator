@@ -1,0 +1,32 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-tailwindcss"
+  ],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "tailwind",
+          "apply",
+          "layer",
+          "variants",
+          "responsive",
+          "screen"
+        ]
+      }
+    ],
+    "block-no-empty": true,
+    "color-no-invalid-hex": true,
+    "declaration-block-no-duplicate-properties": true,
+    "declaration-block-no-shorthand-property-overrides": true,
+    "font-family-no-duplicate-names": true,
+    "function-calc-no-unspaced-operator": true,
+    "no-extra-semicolons": true,
+    "selector-pseudo-class-no-unknown": true,
+    "selector-type-no-unknown": true,
+    "string-no-newline": true,
+    "unit-no-unknown": true
+  }
+}
